@@ -1,0 +1,165 @@
+{
+  "_notes": [
+    "One entry per kit. Newest first is not required; the build script sorts by date.",
+    "builder: 'gary' (confirmed by Gary), 'wife' (shows 'Built by the love of my life'), or null (no credit line). Never guess.",
+    "short / full: YouTube video ids. tiktok / instagram: post ids. reddit: full review URL.",
+    "review: optional block for Gary's own written review text and 8-category ratings. Leave null until Gary supplies it; never invent ratings."
+  ],
+  "builds": [
+    {
+      "slug": "robot-bunny-music-box-am481",
+      "brand": "ROKR", "kit": "Robot Bunny Music Box", "model": "AM481",
+      "date": "2026-11-01", "tags": ["music box", "painted"],
+      "short": "JOYz0ghrODw", "full": "0d36uWCmp_Q",
+      "full_title": "Full Build: Unboxing, Painting & Assembly",
+      "tiktok": "7703330025717681421", "instagram": null,
+      "reddit": "https://www.reddit.com/r/rokrpuzzles/comments/1xlfnrz/rokr_robot_bunny_music_box_am481_review/",
+      "builder": null, "review": null
+    },
+    {
+      "slug": "steampunk-robot-dog-am480",
+      "brand": "ROKR", "kit": "Steampunk Robot Dog", "model": "AM480",
+      "date": "2026-11-04", "tags": ["music box", "steampunk"],
+      "short": "lC4xIxAXN7w", "full": null,
+      "tiktok": "7704464245563444493", "instagram": "DfV8Jd4gXHU",
+      "reddit": null, "builder": null, "review": null
+    },
+    {
+      "slug": "music-park-night-light",
+      "brand": null, "kit": "Music Park Night Light", "model": null,
+      "date": "2026-11-04", "tags": ["night light", "lights"],
+      "short": "X5lklouQInw", "full": null,
+      "tiktok": "7704463532250713358", "instagram": "DfV7vC_AJFI",
+      "reddit": null, "builder": null, "review": null
+    },
+    {
+      "slug": "ocean-fisher-mcd02",
+      "brand": "ROKR", "kit": "Ocean Fisher Pendulum Balance Toy", "model": "MCD02",
+      "date": "2026-11-04", "tags": ["mechanical", "balance toy"],
+      "short": "QBrvmYZDp1U", "full": null,
+      "tiktok": "7704463235713486094", "instagram": "DfV7cP9gOIS",
+      "reddit": null, "builder": null, "review": null
+    },
+    {
+      "slug": "happyduke-toys-eam01",
+      "brand": "ROKR", "kit": "Happyduke Toys", "model": "EAM01",
+      "date": "2026-11-03", "tags": ["miniature house", "lights", "christmas"],
+      "short": "5NKO4LdiqCg", "full": null,
+      "tiktok": "7704140466597416205", "instagram": "DfTadHTAcWa",
+      "reddit": null, "builder": null, "review": null
+    },
+    {
+      "slug": "luminous-globe-st003d",
+      "brand": "ROKR", "kit": "Luminous Globe (Electric Version)", "model": "ST003D",
+      "date": "2026-10-31", "tags": ["mechanical", "lights"],
+      "short": null, "full": "JQH5OYDj1JQ", "full_title": "Electric Version Build",
+      "tiktok": "7703011344936750350", "instagram": null,
+      "reddit": "https://www.reddit.com/r/rokrpuzzles/comments/1xkqemi/rokr_luminous_globe_electric_version_st003d_review/",
+      "builder": null, "review": null
+    },
+    {
+      "slug": "a-frame-cabin-dg181",
+      "brand": "Rolife", "kit": "A-Frame Cabin", "model": "DG181",
+      "date": "2026-10-30", "tags": ["miniature house", "lights"],
+      "short": "7-896FStW_w", "full": null,
+      "tiktok": "7702623121307667726", "instagram": null,
+      "reddit": null, "builder": null, "review": null
+    },
+    {
+      "slug": "sunset-carnival-amt01",
+      "brand": "Rolife", "kit": "Music Dreamer Sunset Carnival", "model": "AMT01",
+      "date": "2026-10-29", "tags": ["music box", "lights"],
+      "short": "ZRTilFI2TtM", "full": null,
+      "tiktok": "7702223464375078157", "instagram": null,
+      "reddit": "https://www.reddit.com/r/rolife/comments/1xiyad3/rolife_sunset_carnival_amt01_completion_and_review/",
+      "builder": null, "review": null
+    },
+    {
+      "slug": "navitas-rover-ls504",
+      "brand": "ROKR", "kit": "Navitas Rover Space Hunting", "model": "LS504",
+      "date": "2026-10-26", "tags": ["mechanical", "space"],
+      "short": "D6tY7051beE", "full": null,
+      "tiktok": "7701122967249423630", "instagram": null,
+      "reddit": "https://www.reddit.com/r/rokrpuzzles/comments/1xgcmv3/rokr_navitas_rover_space_hunting_ls504_review/",
+      "builder": null, "review": null
+    },
+    {
+      "slug": "chillbay-pizzeria-eam02",
+      "brand": "ROKR", "kit": "Chillbay Pizzeria", "model": "EAM02",
+      "date": "2026-10-23", "tags": ["miniature house", "lights"],
+      "short": null, "full": "-n5xWoxBrFc", "full_title": "Build video",
+      "tiktok": null, "instagram": null,
+      "reddit": "https://www.reddit.com/r/rokrpuzzles/comments/1xdplg4/chillbay_pizzeria_eam02/",
+      "builder": null, "review": null
+    },
+    {
+      "slug": "angels-christmas-pyramid-amb01",
+      "brand": "ROKR", "kit": "Angels Christmas Pyramid", "model": "AMB01",
+      "date": "2026-10-22", "tags": ["music box", "christmas", "mechanical"],
+      "short": "0mg3bI_n0HY", "full": null,
+      "tiktok": "7699644788236193037", "instagram": null,
+      "reddit": "https://www.reddit.com/r/rokrpuzzles/comments/1wvcxih/rokr_amb01_angelss_christmas_pyramid/",
+      "builder": "gary", "review": null
+    },
+    {
+      "slug": "dream-gift-factory-eab01",
+      "brand": "ROKR", "kit": "Dream Gift Factory", "model": "EAB01",
+      "date": "2026-10-22", "tags": ["miniature house", "christmas", "lights"],
+      "short": null, "full": "jAOuISa2TTI", "full_title": "Build video",
+      "tiktok": null, "instagram": null,
+      "reddit": "https://www.reddit.com/r/rokrpuzzles/comments/1x1wssq/rokr_dream_gift_factory_eab01/",
+      "builder": null, "review": null
+    },
+    {
+      "slug": "deep-sea-animals-turtle",
+      "brand": "MoyuStore", "kit": "Deep Sea Animals 3 of 7: Turtle", "model": null,
+      "date": "2026-10-22", "tags": ["advent", "steampunk"],
+      "short": "naUaVehihQM", "full": null,
+      "tiktok": null, "instagram": null,
+      "reddit": "https://www.reddit.com/r/DIYModelKits/comments/1wrvx7c/moyustore_christmas_advent_deepsea_animal_review/",
+      "builder": "gary", "review": null
+    },
+    {
+      "slug": "christmas-cuckoo-clock-lcb01",
+      "brand": "ROKR", "kit": "Christmas Cuckoo Clock", "model": "LCB01",
+      "date": "2026-10-22", "tags": ["clock", "christmas", "mechanical"],
+      "short": "wz7NZJFFtlg", "full": null,
+      "tiktok": null, "instagram": null,
+      "reddit": "https://www.reddit.com/r/rokrpuzzles/comments/1x948e9/rokr_christmas_cuckoo_clock_lcb02/",
+      "builder": "gary", "review": null
+    },
+    {
+      "slug": "magic-college",
+      "brand": "Tonecheer", "kit": "Magic College", "model": null,
+      "date": "2026-10-22", "tags": ["miniature house", "lights"],
+      "short": "6SJ0oB9hOCs", "full": null,
+      "tiktok": null, "instagram": null,
+      "reddit": null, "builder": "wife", "review": null
+    },
+    {
+      "slug": "shamrock-harp-pub",
+      "brand": "Fifijoy", "kit": "Shamrock & Harp Pub", "model": null,
+      "date": "2026-10-22", "tags": ["miniature house", "lights"],
+      "short": "uwGQV8wzK4o", "full": null,
+      "tiktok": null, "instagram": "DfVikBcAwYl",
+      "reddit": null, "builder": "gary", "review": null
+    },
+    {
+      "slug": "red-boats-th004",
+      "brand": "Rowood", "kit": "Red Boats", "model": "TH004",
+      "date": "2026-10-22", "tags": ["miniature"],
+      "short": "SCqjJkAeWDM", "full": null,
+      "tiktok": null, "instagram": "De0RaK6RyCQ",
+      "reddit": null, "builder": "wife", "review": null
+    }
+  ],
+  "community": [
+    {
+      "title": "Christmas Music Box Build Event",
+      "where": "Port Orange Elks Lodge",
+      "date": "2026-11-08",
+      "blurb": "A community build day benefiting Florida Elks Children's Therapy Services.",
+      "youtube": "PoKJiAcKLsQ", "tiktok": "7706137816194960654", "instagram": "DfhRNQUgYoh"
+    }
+  ]
+}
