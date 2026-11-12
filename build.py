@@ -7,7 +7,7 @@ Usage:  python build.py            (writes the site to ./docs, which GitHub Page
 Content lives in data/builds.json. To add a new video, add one entry there and rebuild.
 Thumbnails are fetched from YouTube once and cached in static/img/thumbs/.
 """
-import html, json, shutil, sys, urllib.request
+import html, json, re, shutil, sys, urllib.request
 from datetime import date
 from io import BytesIO
 from pathlib import Path
@@ -65,6 +65,78 @@ def fetch_thumb(vid, vertical):
 
 def thumb(vid):
     return f"/img/thumbs/{vid}.webp"
+
+
+def cover(b):
+    """Best picture for a build: its own photo, else its video thumbnail, else None (placeholder tile)."""
+    if b.get("image"):
+        return b["image"]
+    vid = b["short"] or b["full"]
+    return thumb(vid) if vid else None
+
+
+# --------------------------------------------------------------- reviews ----
+def load_review(slug):
+    """Parse data/reviews/<slug>.md: intro paragraphs, then **Category: n/5** (or **Heading**) sections."""
+    p = ROOT / "data" / "reviews" / f"{slug}.md"
+    if not p.exists():
+        return None
+    text = re.sub(r"<!--.*?-->", "", p.read_text(encoding="utf-8"), flags=re.S).strip()
+    intro, sections = [], []
+    for para in (x.strip() for x in re.split(r"\n\s*\n", text) if x.strip()):
+        scored = re.fullmatch(r"\*\*(.+?):\s*([\d.]+)\s*/\s*5\*\*", para)
+        heading = re.fullmatch(r"\*\*([^*]+?)\*\*", para)
+        if scored:
+            sections.append({"name": scored.group(1), "score": float(scored.group(2)), "paras": []})
+        elif heading:
+            sections.append({"name": heading.group(1), "score": None, "paras": []})
+        elif sections:
+            sections[-1]["paras"].append(para)
+        else:
+            intro.append(para)
+    overall = next((s["score"] for s in sections if s["score"] is not None and s["name"].lower().startswith("overall")), None)
+    return {"intro": intro, "sections": sections, "overall": overall}
+
+
+def num(x):
+    return f"{x:g}"
+
+
+def md_inline(p):
+    return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", e(p))
+
+
+def pips(score):
+    whole = int(min(score, 5))
+    half = score < 5 and score - int(score) >= .5
+    out = '<i class="pip on"></i>' * whole + ('<i class="pip half"></i>' if half else "")
+    out += '<i class="pip"></i>' * (5 - whole - (1 if half else 0))
+    if score > 5:
+        out += f'<span class="bonus">+{num(score - 5)}</span>'
+    return f'<span class="pips" aria-hidden="true">{out}</span>'
+
+
+def render_review(b, rv):
+    archive = b.get("review_type") == "archive"
+    parts = []
+    if rv["overall"] is not None:
+        parts.append(f'<div class="overall" aria-label="Overall rating {num(rv["overall"])} out of 5">'
+                     f'<span class="overall-num">{num(rv["overall"])}<small>/5</small></span>'
+                     f'<span class="overall-label">Overall rating{pips(rv["overall"])}</span></div>')
+    scored = [s for s in rv["sections"] if s["score"] is not None and not s["name"].lower().startswith("overall")]
+    if scored:
+        rows = "".join(f'<li><span class="sc-name">{e(s["name"])}</span>{pips(s["score"])}<b>{num(s["score"])}/5</b></li>' for s in scored)
+        parts.append(f'<ul class="scorecard" aria-label="Scores by category">{rows}</ul>')
+    parts += [f"<p>{md_inline(p)}</p>" for p in rv["intro"]]
+    for s in rv["sections"]:
+        tag = f' <span class="score-tag">{num(s["score"])}/5</span>' if s["score"] is not None else ""
+        parts.append(f'<h3>{e(s["name"])}{tag}</h3>' + "".join(f"<p>{md_inline(p)}</p>" for p in s["paras"]))
+    if archive:
+        parts.append('<p class="note">From the review archive: this is a summary of an earlier review. The full original wording was not recovered.</p>')
+    if b["reddit"]:
+        parts.append(f'<p class="ctas"><a class="btn ghost" href="{e(b["reddit"])}" rel="noopener">Read it on Reddit and join the discussion</a></p>')
+    heading = "From the review archive" if archive else "Gary's review"
+    return f'<section class="review-full" id="review"><h2>{heading}</h2>{"".join(parts)}</section>'
 
 
 def player(vid, vertical, label, start=None, end=None):
@@ -149,12 +221,24 @@ def page(path, title, desc, body, og_image=None, active=None):
     return path
 
 
+def placeholder(b, cls="card-img", extra=""):
+    """Gold-framed walnut tile shown until a kit has a photo or video."""
+    mono = e(b["model"] or b["brand"] or "GWVan60")
+    return (f'<span class="{cls} ph"><span class="ph-frame"><span class="ph-star">&#10022;</span>'
+            f'<span class="ph-name">{e(b["kit"])}</span><span class="ph-mono">{mono}</span></span>{extra}</span>')
+
+
 def card(b):
-    vid = b["short"] or b["full"]
+    pic = cover(b)
     sub = " · ".join(x for x in (b["brand"], b["model"]) if x)
     badge = '<span class="badge">Full build</span>' if b["full"] else ""
+    rv = b.get("_review")
+    if rv and rv["overall"] is not None:
+        badge += f'<span class="score-badge" aria-label="Rated {num(rv["overall"])} out of 5">&#9733; {num(rv["overall"])}/5</span>'
+    img = (f'<span class="card-img"><img src="{pic}" alt="" loading="lazy">{badge}</span>' if pic
+           else placeholder(b, extra=badge))
     return (f'<a class="card" href="/builds/{b["slug"]}/" data-brand="{e(b["brand"] or "Other")}">'
-            f'<span class="card-img"><img src="{thumb(vid)}" alt="" loading="lazy">{badge}</span>'
+            f'{img}'
             f'<span class="card-body"><span class="card-title">{e(b["kit"])}</span>'
             f'<span class="card-sub">{e(sub)}</span></span></a>')
 
@@ -166,7 +250,8 @@ def title_block(kicker, title, sub=None):
 
 # ---------------------------------------------------------------- pages -----
 def build_home(builds, community):
-    latest = "".join(card(b) for b in builds[:8])
+    latest = "".join(card(b) for b in [x for x in builds if x["short"] or x["full"]][:8])
+    n_reviews = sum(1 for b in builds if b.get("_review"))
     ev = community[0]
     body = f"""
 <section class="hero">
@@ -201,8 +286,8 @@ def build_home(builds, community):
 <section class="wrap section two-col">
   <div>
     <h2>Reviews</h2>
-    <p>Detailed written reviews on Reddit and Craftime, scored with Gary's eight-category rating system, so other builders know what they're getting into.</p>
-    <p><a class="link" href="/reviews/">Browse reviews &rarr;</a></p>
+    <p>{n_reviews} candid reviews from the workbench, scored with Gary's eight-category rating system: Challenge, Enjoyment, Engineering and Fit, Materials and Finish, Instructions, Display Appeal, Value, and Overall.</p>
+    <p><a class="link" href="/reviews/">Read the reviews &rarr;</a></p>
   </div>
   <div>
     <h2>Community</h2>
@@ -233,12 +318,21 @@ def build_kit(b, builds):
     full_label = b.get("full_title") or "Full build"
     full_fig = (f'<figure class="wide-fig">{player(b["full"], False, f"{name}: {full_label}")}'
                 f'<figcaption>{e(full_label)}</figcaption></figure>') if b["full"] else ""
+    full_section = ""
     if b["short"]:
         main_player = f'<figure>{player(b["short"], True, name)}<figcaption>The short</figcaption></figure>'
         full_section = (f'<section class="full-build"><h2>{e(full_label)}</h2>{full_fig}</section>' if full_fig else "")
+        layout = ""
+    elif b["full"]:
+        main_player, layout = full_fig, " wide-main"
+    elif b.get("image"):
+        main_player = f'<figure class="photo"><img src="{b["image"]}" alt="The finished {e(b["kit"])}"></figure>'
+        layout = ""
     else:
-        main_player, full_section = full_fig, ""
-    facts = [("Brand", b["brand"]), ("Model", b["model"]), ("Posted", fmt_date(b["date"])), ("", builder_line(b))]
+        main_player, layout = placeholder(b, cls="photo"), ""
+    rv = b.get("_review")
+    facts = [("Brand", b["brand"]), ("Model", b["model"]), ("Posted", fmt_date(b["date"]) if b["date"] else None),
+             ("Rating", f'{num(rv["overall"])}/5' if rv and rv["overall"] is not None else None), ("", builder_line(b))]
     facts_html = "".join(f"<div><dt>{k}</dt><dd>{e(v)}</dd></div>" if k else f'<div class="credit"><dd>{e(v)}</dd></div>'
                          for k, v in facts if v)
     links = []
@@ -251,45 +345,79 @@ def build_kit(b, builds):
     if b["instagram"]:
         links.append(("Instagram", f"https://www.instagram.com/reel/{b['instagram']}/"))
     links_html = "".join(f'<a class="pill" href="{u}" rel="noopener">{n}</a>' for n, u in links)
-    review = ""
-    if b.get("review"):
-        r = b["review"]
-        rows = "".join(f'<tr><th scope="row">{e(k)}</th><td>{e(v)}</td></tr>' for k, v in r.get("ratings", {}).items())
-        review = f'<section class="review"><h2>Review</h2>{"".join(f"<p>{e(p)}</p>" for p in r.get("text", []))}{f"<table>{rows}</table>" if rows else ""}</section>'
-    if b["reddit"]:
-        review += f'<p><a class="btn" href="{e(b["reddit"])}" rel="noopener">Read the full review on Reddit</a></p>'
+    watch = f'<h2 class="h3">Watch on</h2><p class="pills">{links_html}</p>' if links else ""
+    jump = f'<p class="ctas"><a class="btn" href="#review">Read Gary\'s review</a></p>' if rv else ""
+    if not rv and b["reddit"]:
+        jump = f'<p class="ctas"><a class="btn" href="{e(b["reddit"])}" rel="noopener">Read the review on Reddit</a></p>'
+    review_html = render_review(b, rv) if rv else ""
     more = [x for x in builds if x is not b and x["brand"] == b["brand"]][:3] or [x for x in builds if x is not b][:3]
     body = f"""
 <div class="wrap section">
   <p class="crumbs"><a href="/builds/">Builds</a> / {e(b["kit"])}</p>
   {title_block(b["brand"] or "Build", b["kit"], sub if b["model"] else None)}
-  <div class="kit-row{' wide-main' if not b['short'] else ''}">
+  <div class="kit-row{layout}">
     <div class="players">{main_player}</div>
     <aside class="kit-info">
       <dl class="facts">{facts_html}</dl>
-      <h2 class="h3">Watch on</h2><p class="pills">{links_html}</p>
-      {review}
+      {watch}
+      {jump}
     </aside>
   </div>
+  {review_html}
   {full_section}
   <section class="section"><div class="section-head"><h2>More builds</h2><a href="/builds/">All builds &rarr;</a></div>
   <div class="grid">{"".join(card(x) for x in more)}</div></section>
 </div>"""
-    desc = f"{name}: build video{' and review' if b['reddit'] else ''} by GWVan60."
-    page(f"/builds/{b['slug']}/", name, desc, body, og_image=thumb(b["short"] or b["full"]), active="Builds")
+    if rv and rv["overall"] is not None:
+        desc = f"{name}: Gary's review, rated {num(rv['overall'])}/5, with notes on challenge, fit, materials, instructions and value. By GWVan60."
+    elif rv:
+        desc = f"{name}: Gary's build story and review. By GWVan60."
+    else:
+        desc = f"{name}: build video{' and review' if b['reddit'] else ''} by GWVan60."
+    page(f"/builds/{b['slug']}/", name, desc, body, og_image=cover(b), active="Builds")
+
+
+CATEGORIES = ["Challenge", "Enjoyment", "Engineering and Fit", "Materials and Finish",
+              "Instructions", "Display Appeal", "Value", "Overall Rating"]
+
+
+def rev_row(b):
+    rv = b["_review"]
+    pic = cover(b)
+    img = f'<img src="{pic}" alt="" loading="lazy">' if pic else placeholder(b, cls="rev-ph")
+    meta = " · ".join(x for x in (b["brand"], b["model"]) if x)
+    score = (f'<span class="rev-score">{pips(rv["overall"])}<b>{num(rv["overall"])}/5</b></span>'
+             if rv["overall"] is not None else "")
+    first = rv["intro"][0] if rv["intro"] else next((s["paras"][0] for s in rv["sections"] if s["paras"]), "")
+    teaser = first if len(first) <= 150 else first[:first.rfind(" ", 0, 150)] + "..."
+    return (f'<li><a class="rev-row" href="/builds/{b["slug"]}/#review">{img}'
+            f'<span class="rev-text"><strong>{e(b["kit"])}</strong><span class="card-sub">{e(meta)}</span>'
+            f'{score}<span class="rev-teaser">{e(teaser)}</span></span></a></li>')
 
 
 def build_reviews(builds):
-    rev = [b for b in builds if b["reddit"]]
-    items = "".join(
-        f'<li><a class="rev-row" href="/builds/{b["slug"]}/"><img src="{thumb(b["short"] or b["full"])}" alt="" loading="lazy">'
-        f'<span><strong>{e(b["kit"])}</strong><span class="card-sub">{e(" · ".join(x for x in (b["brand"], b["model"]) if x))} &middot; {fmt_date(b["date"])}</span></span></a></li>'
-        for b in rev)
+    reviewed = [b for b in builds if b.get("_review")]
+    rated = [b for b in reviewed if b.get("review_type") == "full" and b["_review"]["overall"] is not None]
+    story = [b for b in reviewed if b.get("review_type") == "full" and b["_review"]["overall"] is None]
+    archive = [b for b in reviewed if b.get("review_type") == "archive"]
+    cats = "".join(f"<li>{c}</li>" for c in CATEGORIES)
     body = f"""
 <div class="wrap section narrow">
-  {title_block("Honest takes", "Reviews", "Eight-category rating system")}
-  <p class="lede">Gary's detailed written reviews are posted to Reddit and Craftime and scored across eight categories. The full write-ups live on Reddit, where the community can weigh in; each build page below links straight to its review.</p>
-  <ul class="rev-list">{items}</ul>
+  {title_block("Honest takes", "Reviews", f"{len(reviewed)} kits reviewed")}
+  <p class="lede">Candid, first-person reviews from the workbench: what worked, what broke, what needed wax, and whether the finished model earned its spot on the shelf.</p>
+  <div class="framed system">
+    <h2>The rating system</h2>
+    <p>Each kit is scored out of 5 in eight categories. Gary invented the system while building a KPOP Demon Hunters 4D kit. Now and then a kit earns a 6. His rating system, his rules.</p>
+    <ol class="cat-list">{cats}</ol>
+  </div>
+  <h2>Rated reviews</h2>
+  <ul class="rev-list">{"".join(rev_row(b) for b in rated)}</ul>
+  <h2>Before the rating system</h2>
+  <p>Earlier reviews, written as build stories.</p>
+  <ul class="rev-list">{"".join(rev_row(b) for b in story)}</ul>
+  <h2>From the archive</h2>
+  <p>Summaries of Gary's earliest reviews. The full original wording was not recovered.</p>
+  <ul class="rev-list">{"".join(rev_row(b) for b in archive)}</ul>
 </div>"""
     page("/reviews/", "Reviews", "Written reviews of wooden model kits from ROKR, Rolife and more, scored with GWVan60's eight-category rating system.", body, active="Reviews")
 
@@ -401,7 +529,10 @@ def build_404():
 # ----------------------------------------------------------------- main -----
 def main():
     data = json.loads((ROOT / "data" / "builds.json").read_text(encoding="utf-8"))
-    builds = sorted(data["builds"], key=lambda b: b["date"], reverse=True)
+    # newest first; kits with no date (reviewed but not posted yet) go after, in file order
+    builds = sorted(data["builds"], key=lambda b: b["date"] or "", reverse=True)
+    for b in builds:
+        b["_review"] = load_review(b["slug"])
     community = data["community"]
 
     THUMBS.mkdir(parents=True, exist_ok=True)
