@@ -9,7 +9,8 @@ if (btn && nav) btn.addEventListener('click', () => {
 // Click-to-play YouTube: nothing loads from YouTube until a visitor presses play.
 document.querySelectorAll('.yt').forEach(el => el.addEventListener('click', () => {
   const f = document.createElement('iframe');
-  f.src = `https://www.youtube-nocookie.com/embed/${el.dataset.id}?autoplay=1&rel=0&modestbranding=1`;
+  const seg = (el.dataset.start ? `&start=${el.dataset.start}` : '') + (el.dataset.end ? `&end=${el.dataset.end}` : '');
+  f.src = `https://www.youtube-nocookie.com/embed/${el.dataset.id}?autoplay=1&rel=0&modestbranding=1${seg}`;
   f.title = el.getAttribute('aria-label') || 'YouTube video';
   f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
   f.allowFullscreen = true;

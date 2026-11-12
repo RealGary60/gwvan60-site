@@ -67,10 +67,12 @@ def thumb(vid):
     return f"/img/thumbs/{vid}.webp"
 
 
-def player(vid, vertical, label):
-    """Click-to-play facade: shows our cached thumbnail, loads YouTube only on click."""
+def player(vid, vertical, label, start=None, end=None):
+    """Click-to-play facade: shows our cached thumbnail, loads YouTube only on click.
+    start/end (seconds) limit playback to one segment of a longer video."""
     cls = "player vertical" if vertical else "player wide"
-    return (f'<div class="{cls}"><button class="yt" data-id="{e(vid)}" aria-label="Play: {e(label)}">'
+    seg = (f' data-start="{int(start)}"' if start else "") + (f' data-end="{int(end)}"' if end else "")
+    return (f'<div class="{cls}"><button class="yt" data-id="{e(vid)}"{seg} aria-label="Play: {e(label)}">'
             f'<img src="{thumb(vid)}" alt="" loading="lazy">'
             f'<span class="play" aria-hidden="true"><svg viewBox="0 0 68 48"><path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.2.3 34 .3 34 .3S12.8.3 7.5 1.7a8.5 8.5 0 0 0-6 6C.2 13 .2 24 .2 24s0 11 1.3 16.3a8.5 8.5 0 0 0 6 6C12.8 47.7 34 47.7 34 47.7s21.2 0 26.5-1.4a8.5 8.5 0 0 0 6-6C67.8 35 67.8 24 67.8 24s0-11-1.3-16.3z" fill="#e8c766"/><path d="M27 34V14l18 10z" fill="#0d1626"/></svg></span>'
             f'</button></div>')
@@ -204,7 +206,7 @@ def build_home(builds, community):
   </div>
   <div>
     <h2>Community</h2>
-    <p>Moderator of r/ROKRPuzzles, r/ugears and r/DIYModelKits, and a board member of Florida Elks Children's Therapy Services. Most recently: the {e(ev["title"])} at the {e(ev["where"])}.</p>
+    <p>Moderator of r/ROKRPuzzles, r/ugears and r/DIYModelKits, and a board member of Florida Elks Children's Therapy Services. Speaker at Rolife's 9th anniversary celebration. Most recently: the {e(ev["title"])} at the {e(ev["where"])}.</p>
     <p><a class="link" href="/community/">See the community work &rarr;</a></p>
   </div>
 </section>
@@ -332,12 +334,30 @@ def build_meditation():
          "A conceptual white paper by Gary VanOpdorp on precision model building as active meditation: attention, flow, dexterity, completion, community and stress.", body, active="Active Meditation")
 
 
-def build_community(community):
+def mmss(s):
+    return f"{s // 60}:{s % 60:02d}"
+
+
+def talk_block(t):
+    return f"""
+  <article class="talk">
+    <h3>{e(t["title"])}</h3>
+    <p class="card-sub">{e(t["role"])} &middot; {e(t["where"])} &middot; {e(t["when"])}</p>
+    <p>{e(t["blurb"])}</p>
+    {player(t["youtube"], False, f'{t["title"]}: Gary VanOpdorp', t.get("start"), t.get("end"))}
+    <p class="credit-line">{e(t["credit"])} This player shows Gary's talk only ({mmss(t["start"])}&ndash;{mmss(t["end"])}).
+      <a class="link" href="https://www.youtube.com/watch?v={e(t["youtube"])}&amp;t={t["start"]}s" rel="noopener">Watch on YouTube</a></p>
+  </article>"""
+
+
+def build_community(community, talks):
     ev = community[0]
+    talks_html = "".join(talk_block(t) for t in talks)
     body = f"""
 <div class="wrap section narrow">
   {title_block("Around the workbench", "Community")}
-  <p class="lede">Model building is solitary at the bench and social around it. Gary helps moderate three of the hobby's online communities and brings building to his local lodge.</p>
+  <p class="lede">Model building is solitary at the bench and social around it. Gary helps moderate three of the hobby's online communities, speaks at hobby events, and brings building to his local lodge.</p>
+  <h2>Speaking</h2>{talks_html}
   <h2>Moderator</h2>
   <ul class="pills-list">
     <li><a class="pill" href="https://www.reddit.com/r/rokrpuzzles/" rel="noopener">r/ROKRPuzzles</a></li>
@@ -351,7 +371,7 @@ def build_community(community):
   <p>{e(ev["blurb"])}</p>
   {player(ev["youtube"], False, ev["title"])}
 </div>"""
-    page("/community/", "Community", "GWVan60 in the community: Reddit moderation, Florida Elks Children's Therapy Services, and lodge build events.", body, active="Community")
+    page("/community/", "Community", "GWVan60 in the community: speaking at Rolife's 9th anniversary, Reddit moderation, Florida Elks Children's Therapy Services, and lodge build events.", body, active="Community")
 
 
 def build_about(builds):
@@ -363,6 +383,7 @@ def build_about(builds):
     <div>
       <p class="lede">I'm Gary VanOpdorp, GWVan60 online. I've built more than 70 wooden and mechanical kits, and over the years the hobby has grown from assembly into sanding, edge coloring, painting, rigging, custom signs, electrical add-ons and repairs.</p>
       <p>I film my builds at the bench and write detailed reviews so other builders know what they're getting into. The {len(builds)} builds on this site are the ones I've published so far.</p>
+      <p>In September 2026 I was one of the speakers at Rolife's 9th anniversary celebration at American Dream Mall in New Jersey. <a class="link" href="/community/">Watch my talk</a>.</p>
       <p>Away from the bench, I work as a fractional and full-time consultant in data and business analytics.</p>
     </div>
   </div>
@@ -389,7 +410,8 @@ def main():
             fetch_thumb(b["short"], True)
         if b["full"]:
             fetch_thumb(b["full"], False)
-    for c in community:
+    talks = data.get("talks", [])
+    for c in community + talks:
         fetch_thumb(c["youtube"], False)
 
     # empty dist without removing the folder itself (a shell or the preview server may be using it)
@@ -405,7 +427,7 @@ def main():
         build_kit(b, builds); paths.append(f"/builds/{b['slug']}/")
     build_reviews(builds); paths.append("/reviews/")
     build_meditation(); paths.append("/active-meditation/")
-    build_community(community); paths.append("/community/")
+    build_community(community, talks); paths.append("/community/")
     build_about(builds); paths.append("/about/")
     build_404()
 

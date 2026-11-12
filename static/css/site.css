@@ -172,6 +172,9 @@ p { margin: 0 0 1em; }
 .active-list h3 { margin: 0 0 4px; }
 .active-list p { margin: 0; color: var(--muted); }
 .evidence li { margin-bottom: .6em; }
+.talk { margin-bottom: 36px; }
+.talk h3 { margin: .2em 0 .2em; font-size: 1.6rem; }
+.credit-line { color: var(--muted); font-size: .9rem; margin-top: 10px; }
 .note { margin-top: 32px; padding: 16px 18px; border: 1px dashed var(--gold-deep); border-radius: var(--radius); color: var(--muted); font-size: .95rem; }
 .about-row { display: grid; grid-template-columns: 200px 1fr; gap: 32px; align-items: start; }
 .about-row img { border-radius: 50%; }
