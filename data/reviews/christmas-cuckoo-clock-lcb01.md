@@ -1,4 +1,4 @@
-<!-- source heading: ROKR Christmas Cuckoo Clock LC901C | type: full -->
+<!-- source heading: ROKR Christmas Cuckoo Clock LCB01 (archive said LC901C; Gary confirmed LCB01 on 2026-11-12) | type: full -->
 I finally finished it. I found this model quite fiddly. Getting the cuckoo clock mechanism working and keeping it working was an adventure, but I am now an expert. If you build this one and get stuck, I am there for you.
 
 The model went into time-out a couple of times so I could think about it. The base construction was fine, the fit was generally good, and only a few places needed glue for reinforcement.

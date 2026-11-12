@@ -20,6 +20,7 @@ ROOT = Path(__file__).parent
 DIST = ROOT / "docs"          # GitHub Pages serves this folder
 STATIC = ROOT / "static"
 THUMBS = STATIC / "img" / "thumbs"
+HELD = ROOT / "data" / "held"     # git-ignored: kits/reviews kept off the site until publish_after
 
 SOCIAL = [
     ("YouTube", "https://www.youtube.com/@GWVan60", "@GWVan60"),
@@ -79,6 +80,8 @@ def cover(b):
 def load_review(slug):
     """Parse data/reviews/<slug>.md: intro paragraphs, then **Category: n/5** (or **Heading**) sections."""
     p = ROOT / "data" / "reviews" / f"{slug}.md"
+    if not p.exists():
+        p = HELD / f"{slug}.md"          # private, git-ignored (e.g. gifts not yet given)
     if not p.exists():
         return None
     text = re.sub(r"<!--.*?-->", "", p.read_text(encoding="utf-8"), flags=re.S).strip()
@@ -529,6 +532,15 @@ def build_404():
 # ----------------------------------------------------------------- main -----
 def main():
     data = json.loads((ROOT / "data" / "builds.json").read_text(encoding="utf-8"))
+    # Held kits (data/held/held.json, never committed) join the site only on/after their publish_after date.
+    held_file = HELD / "held.json"
+    if held_file.exists():
+        for b in json.loads(held_file.read_text(encoding="utf-8"))["builds"]:
+            if date.today().isoformat() >= b["publish_after"]:
+                data["builds"].append(b)
+                print("  releasing held kit:", b["slug"])
+            else:
+                print(f"  holding {b['slug']} until {b['publish_after']}")
     # newest first; kits with no date (reviewed but not posted yet) go after, in file order
     builds = sorted(data["builds"], key=lambda b: b["date"] or "", reverse=True)
     for b in builds:
