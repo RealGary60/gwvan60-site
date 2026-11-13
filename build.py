@@ -142,13 +142,13 @@ def render_review(b, rv):
     return f'<section class="review-full" id="review"><h2>{heading}</h2>{"".join(parts)}</section>'
 
 
-def player(vid, vertical, label, start=None, end=None):
+def player(vid, vertical, label, start=None, end=None, poster=None):
     """Click-to-play facade: shows our cached thumbnail, loads YouTube only on click.
     start/end (seconds) limit playback to one segment of a longer video."""
     cls = "player vertical" if vertical else "player wide"
     seg = (f' data-start="{int(start)}"' if start else "") + (f' data-end="{int(end)}"' if end else "")
     return (f'<div class="{cls}"><button class="yt" data-id="{e(vid)}"{seg} aria-label="Play: {e(label)}">'
-            f'<img src="{thumb(vid)}" alt="" loading="lazy">'
+            f'<img src="{poster or thumb(vid)}" alt="" loading="lazy">'
             f'<span class="play" aria-hidden="true"><svg viewBox="0 0 68 48"><path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.2.3 34 .3 34 .3S12.8.3 7.5 1.7a8.5 8.5 0 0 0-6 6C.2 13 .2 24 .2 24s0 11 1.3 16.3a8.5 8.5 0 0 0 6 6C12.8 47.7 34 47.7 34 47.7s21.2 0 26.5-1.4a8.5 8.5 0 0 0 6-6C67.8 35 67.8 24 67.8 24s0-11-1.3-16.3z" fill="#e8c766"/><path d="M27 34V14l18 10z" fill="#0d1626"/></svg></span>'
             f'</button></div>')
 
@@ -319,7 +319,9 @@ def build_kit(b, builds):
     name = title_of(b)
     sub = " · ".join(x for x in (b["brand"], b["model"]) if x)
     full_label = b.get("full_title") or "Full build"
-    full_fig = (f'<figure class="wide-fig">{player(b["full"], False, f"{name}: {full_label}")}'
+    full_vert = bool(b.get("full_vertical"))   # a full build filmed upright (phone portrait)
+    full_fig = (f'<figure{"" if full_vert else " class=\"wide-fig\""}>'
+                f'{player(b["full"], full_vert, f"{name}: {full_label}", poster=b.get("image") if full_vert else None)}'
                 f'<figcaption>{e(full_label)}</figcaption></figure>') if b["full"] else ""
     full_section = ""
     if b["short"]:
@@ -327,7 +329,7 @@ def build_kit(b, builds):
         full_section = (f'<section class="full-build"><h2>{e(full_label)}</h2>{full_fig}</section>' if full_fig else "")
         layout = ""
     elif b["full"]:
-        main_player, layout = full_fig, " wide-main"
+        main_player, layout = full_fig, ("" if full_vert else " wide-main")
     elif b.get("image"):
         main_player = f'<figure class="photo"><img src="{b["image"]}" alt="The finished {e(b["kit"])}"></figure>'
         layout = ""
@@ -563,7 +565,7 @@ def main():
         if b["short"]:
             fetch_thumb(b["short"], True)
         if b["full"]:
-            fetch_thumb(b["full"], False)
+            fetch_thumb(b["full"], bool(b.get("full_vertical")))
     talks = data.get("talks", [])
     for c in community + talks:
         fetch_thumb(c["youtube"], False)
