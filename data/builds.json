@@ -503,8 +503,8 @@
       "review_type": "archive"
     },
     {
-      "slug": "rokr-sailing-ship-tg305",
-      "brand": "ROKR",
+      "slug": "rolife-sailing-ship-tg305",
+      "brand": "Rolife",
       "kit": "Sailing Ship",
       "model": "TG305",
       "date": null,
@@ -516,9 +516,12 @@
       "tiktok": null,
       "instagram": null,
       "reddit": null,
-      "image": "/img/builds/rokr-sailing-ship-tg305.webp",
+      "image": "/img/builds/rolife-sailing-ship-tg305.webp",
       "builder": null,
-      "review_type": "archive"
+      "review_type": "archive",
+      "aliases": [
+        "rokr-sailing-ship-tg305"
+      ]
     },
     {
       "slug": "rokr-swing-ride",

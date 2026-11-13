@@ -524,6 +524,17 @@ def build_about(builds):
     page("/about/", "About", "About Gary VanOpdorp (GWVan60): model builder, reviewer, Reddit moderator and data consultant.", body, active="About")
 
 
+def build_redirect(old_path, new_path):
+    """Static forwarding page for a renamed address (GitHub Pages has no server-side redirects)."""
+    out = DIST / old_path.strip("/") / "index.html"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
+<title>Moved | GWVan60</title><link rel="canonical" href="{SITE_URL}{new_path}">
+<meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url={new_path}">
+</head><body><p>This page moved to <a href="{new_path}">{SITE_URL}{new_path}</a>.</p></body></html>
+""", encoding="utf-8")
+
+
 def build_404():
     body = f"""<div class="wrap section narrow center">{title_block("404", "That part isn't in the box")}<p>The page you were looking for doesn't exist. Try the <a class="link" href="/builds/">builds</a> or head <a class="link" href="/">home</a>.</p></div>"""
     page("/404.html", "Not found", "Page not found.", body)
@@ -568,6 +579,8 @@ def main():
     build_index(builds); paths.append("/builds/")
     for b in builds:
         build_kit(b, builds); paths.append(f"/builds/{b['slug']}/")
+        for old in b.get("aliases", []):      # old addresses forward to the current page
+            build_redirect(f"/builds/{old}/", f"/builds/{b['slug']}/")
     build_reviews(builds); paths.append("/reviews/")
     build_meditation(); paths.append("/active-meditation/")
     build_community(community, talks); paths.append("/community/")
