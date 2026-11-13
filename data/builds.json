@@ -544,6 +544,25 @@
       "image": "/img/builds/rokr-swing-ride.webp",
       "builder": null,
       "review_type": "archive"
+    },
+    {
+      "slug": "rowood-pink-rose-tw041",
+      "brand": "Rowood",
+      "kit": "Pink Rose",
+      "model": "TW041",
+      "date": null,
+      "tags": [
+        "miniature",
+        "painted"
+      ],
+      "short": null,
+      "full": null,
+      "tiktok": null,
+      "instagram": null,
+      "reddit": null,
+      "image": null,
+      "builder": "gary",
+      "review_type": "full"
     }
   ],
   "talks": [
