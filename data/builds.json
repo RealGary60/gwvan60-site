@@ -5,7 +5,9 @@
     "short / full: YouTube video ids. tiktok / instagram: post ids. reddit: full review URL.",
     "Reviews live in data/reviews/<slug>.md (Gary's own words). review_type: 'full' (first-person review, may contain **Category: n/5** ratings) or 'archive' (older summary; full text not recovered).",
     "image: optional photo path under static/, e.g. /img/builds/<slug>.webp. Used when there is no video, and for cards/sharing.",
-    "date: null for kits not yet posted anywhere; they sort after dated builds."
+    "date: null for kits not yet posted anywhere; they sort after dated builds.",
+    "verdict: one short sentence shown beside the overall score on the kit page. full_minutes: runtime of the full build, shown as 'Full build . 34 min'.",
+    "guides: short troubleshooting write-ups. Body lives in data/guides/<slug>.md. 'kit' is the build slug it is linked from."
   ],
   "builds": [
     {
@@ -406,7 +408,9 @@
       "reddit": null,
       "image": "/img/builds/rokr-bulldozer-tg509k.webp",
       "builder": "gary",
-      "review_type": "full"
+      "review_type": "full",
+      "full_minutes": 34,
+      "verdict": "A fun 4.5/5 build with plenty of moving parts. The thin wood and tiny pieces make it trickier than the box suggests."
     },
     {
       "slug": "rolife-classic-carousel-amc01",
@@ -587,6 +591,15 @@
       "youtube": "PoKJiAcKLsQ",
       "tiktok": "7706137816194960654",
       "instagram": "DfhRNQUgYoh"
+    }
+  ],
+  "guides": [
+    {
+      "slug": "cuckoo-clock-santa-keeps-sticking",
+      "kit": "christmas-cuckoo-clock-lcb01",
+      "title": "Santa keeps getting stuck in the cuckoo clock",
+      "sub": "ROKR Christmas Cuckoo Clock LCB01",
+      "blurb": "Santa stops partway round, or never comes out at all. Everything I tried on my own clock, and the one thing that fixed it."
     }
   ]
 }

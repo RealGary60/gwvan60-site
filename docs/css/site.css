@@ -240,3 +240,42 @@ p { margin: 0 0 1em; }
 .star { color: var(--gold); margin: 14px 0 0; }
 .copy { text-align: center; color: var(--muted); font-size: .85rem; margin: 18px 0 0; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* ---- sticky-header anchor fix: #review and other jumps clear the header ---- */
+html { scroll-padding-top: 88px; }
+:target { scroll-margin-top: 88px; }
+
+/* short verdict beside the overall score */
+.overall { flex-wrap: wrap; }
+.verdict { flex: 1 1 260px; min-width: 240px; max-width: 460px; margin: 0; text-align: left;
+           border-left: 3px solid var(--gold); padding: 4px 0 4px 16px; font-size: 1.02rem; color: var(--text); }
+@media (max-width: 640px) { .verdict { flex-basis: 100%; max-width: none; } }
+
+/* search + filter block on the Reviews page */
+.finder { margin: 0 0 24px; }
+.search { display: block; margin: 0 auto 16px; max-width: 460px; }
+.search input { width: 100%; background: var(--panel); color: var(--text); border: 1px solid var(--gold-soft);
+                border-radius: 999px; padding: 10px 18px; font: 400 1rem var(--sans); }
+.search input::placeholder { color: var(--muted); }
+.search input:focus { border-color: var(--gold); outline: 2px solid var(--gold); outline-offset: 2px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.no-hits { text-align: center; color: var(--muted); }
+.rev-list li[hidden], h2[hidden], .rev-list[hidden] { display: none; }
+
+/* collapsible "How I rate kits" */
+details.system { padding: 18px clamp(16px, 4vw, 32px); }
+details.system summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 10px; }
+details.system summary::-webkit-details-marker { display: none; }
+details.system summary h2 { display: inline; margin: 0; }
+details.system summary::after { content: "+"; margin-left: auto; color: var(--gold); font: 700 1.5rem var(--sans); line-height: 1; }
+details.system[open] summary::after { content: "\2212"; }
+
+/* plain YouTube link under a player */
+.watch-yt { flex: 0 0 100%; width: 100%; order: 99; text-align: center; margin: 14px 0 0; }
+.wide-main .watch-yt { text-align: left; }
+
+/* troubleshooting guide callout on a kit page */
+.guide-link { background: var(--panel); border: 1px solid var(--gold-soft); border-left: 3px solid var(--gold);
+              border-radius: var(--radius); padding: 20px 24px; margin: 28px 0; }
+.guide-link h2 { margin: .2em 0 .4em; }
+.guide-link p:last-of-type { margin-bottom: 0; }

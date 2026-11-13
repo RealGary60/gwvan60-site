@@ -31,6 +31,9 @@ SOCIAL = [
 NAV = [("Builds", "/builds/"), ("Reviews", "/reviews/"),
        ("Active Meditation", "/active-meditation/"), ("Community", "/community/"), ("About", "/about/")]
 WHITEPAPER = "/papers/active-meditation-through-model-building.pdf"
+# Where clubs and kit makers can reach me. No email address on the public site.
+CONTACT = [("YouTube", "https://www.youtube.com/@GWVan60", "@GWVan60"),
+           ("Reddit", "https://www.reddit.com/user/GWVan60/", "u/GWVan60")]
 
 e = lambda s: html.escape(str(s), quote=True)
 
@@ -68,6 +71,16 @@ def thumb(vid):
     return f"/img/thumbs/{vid}.webp"
 
 
+def video_label(b):
+    """What kind of video a kit has, with its runtime: 'Full build · 34 min' or 'Short'."""
+    if b.get("full"):
+        mins = b.get("full_minutes")
+        return f"Full build · {mins} min" if mins else "Full build"
+    if b.get("short"):
+        return "Short"
+    return None
+
+
 def cover(b):
     """Best picture for a build: its own photo, else its video thumbnail, else None (placeholder tile)."""
     if b.get("image"):
@@ -84,6 +97,10 @@ def load_review(slug):
         p = HELD / f"{slug}.md"          # private, git-ignored (e.g. gifts not yet given)
     if not p.exists():
         return None
+    return parse_md(p)
+
+
+def parse_md(p):
     text = re.sub(r"<!--.*?-->", "", p.read_text(encoding="utf-8"), flags=re.S).strip()
     intro, sections = [], []
     for para in (x.strip() for x in re.split(r"\n\s*\n", text) if x.strip()):
@@ -123,9 +140,11 @@ def render_review(b, rv):
     archive = b.get("review_type") == "archive"
     parts = []
     if rv["overall"] is not None:
+        verdict = f'<p class="verdict">{md_inline(b["verdict"])}</p>' if b.get("verdict") else ""
         parts.append(f'<div class="overall" aria-label="Overall rating {num(rv["overall"])} out of 5">'
                      f'<span class="overall-num">{num(rv["overall"])}<small>/5</small></span>'
-                     f'<span class="overall-label">Overall rating{pips(rv["overall"])}</span></div>')
+                     f'<span class="overall-label">Overall rating{pips(rv["overall"])}</span>'
+                     f'{verdict}</div>')
     scored = [s for s in rv["sections"] if s["score"] is not None and not s["name"].lower().startswith("overall")]
     if scored:
         rows = "".join(f'<li><span class="sc-name">{e(s["name"])}</span>{pips(s["score"])}<b>{num(s["score"])}/5</b></li>' for s in scored)
@@ -138,7 +157,7 @@ def render_review(b, rv):
         parts.append('<p class="note">From the review archive: this is a summary of an earlier review. The full original wording was not recovered.</p>')
     if b["reddit"]:
         parts.append(f'<p class="ctas"><a class="btn ghost" href="{e(b["reddit"])}" rel="noopener">Read it on Reddit and join the discussion</a></p>')
-    heading = "From the review archive" if archive else "Gary's review"
+    heading = "From the review archive" if archive else "My review"
     return f'<section class="review-full" id="review"><h2>{heading}</h2>{"".join(parts)}</section>'
 
 
@@ -155,7 +174,7 @@ def player(vid, vertical, label, start=None, end=None, poster=None):
 
 def builder_line(b):
     if b["builder"] == "gary":
-        return "Built by Gary"
+        return "I built this one"
     if b["builder"] == "wife":
         return "Built by the love of my life"
     return None
@@ -234,13 +253,15 @@ def placeholder(b, cls="card-img", extra=""):
 def card(b):
     pic = cover(b)
     sub = " · ".join(x for x in (b["brand"], b["model"]) if x)
-    badge = '<span class="badge">Full build</span>' if b["full"] else ""
+    vl = video_label(b)
+    badge = f'<span class="badge">{e(vl)}</span>' if vl else ""
     rv = b.get("_review")
     if rv and rv["overall"] is not None:
         badge += f'<span class="score-badge" aria-label="Rated {num(rv["overall"])} out of 5">&#9733; {num(rv["overall"])}/5</span>'
     img = (f'<span class="card-img"><img src="{pic}" alt="" loading="lazy">{badge}</span>' if pic
            else placeholder(b, extra=badge))
-    return (f'<a class="card" href="/builds/{b["slug"]}/" data-brand="{e(b["brand"] or "Other")}">'
+    search = " ".join(x for x in (b["kit"], b["model"], b["brand"]) if x).lower()
+    return (f'<a class="card" href="/builds/{b["slug"]}/" data-brand="{e(b["brand"] or "Other")}" data-search="{e(search)}">'
             f'{img}'
             f'<span class="card-body"><span class="card-title">{e(b["kit"])}</span>'
             f'<span class="card-sub">{e(sub)}</span></span></a>')
@@ -253,7 +274,7 @@ def title_block(kicker, title, sub=None):
 
 # ---------------------------------------------------------------- pages -----
 def build_home(builds, community):
-    latest = "".join(card(b) for b in [x for x in builds if x["short"] or x["full"]][:8])
+    latest = "".join(card(b) for b in [x for x in builds if x["short"] or x["full"]][:4])
     n_reviews = sum(1 for b in builds if b.get("_review"))
     ev = community[0]
     body = f"""
@@ -264,8 +285,8 @@ def build_home(builds, community):
       <p class="kicker">&#10022; Gary VanOpdorp &#10022;</p>
       <h1>GWVan60</h1>
       <p class="rule-sub">3D Puzzles &middot; Miniature Models</p>
-      <p class="lede">Wooden mechanical kits, miniature houses and music boxes, built by hand and filmed at the bench. Honest reviews, full builds, and the case for model building as active meditation.</p>
-      <p class="ctas"><a class="btn" href="/builds/">Watch the builds</a><a class="btn ghost" href="/active-meditation/">Read the white paper</a></p>
+      <p class="lede">I'm Gary, and I'm endlessly curious. That's how a wooden bulldozer, a miniature pub, and a tiny metal sea turtle all ended up on my workbench. I film my builds and write about what worked, what broke, and what needed wax.</p>
+      <p class="ctas"><a class="btn" href="/reviews/">Browse kit reviews</a><a class="btn" href="/builds/">Watch build videos</a></p>
     </div>
   </div>
 </section>
@@ -280,8 +301,8 @@ def build_home(builds, community):
     <div class="framed">
       <p class="kicker">White paper &middot; September 2026</p>
       <h2>Active Meditation Through Model Building</h2>
-      <p>For some people, the route to a quieter mind is not stillness. It is focused making. A framework linking precision craft with attention, flow, dexterity, completion, community and stress, grounded in 70+ builds and the research.</p>
-      <p class="ctas"><a class="btn" href="/active-meditation/">Read the summary</a><a class="btn ghost" href="{WHITEPAPER}">Download PDF</a></p>
+      <p>For some people, the route to a quieter mind is not stillness. It is focused making. I wrote this after 70+ builds: a framework linking precision craft with attention, flow, dexterity, completion, community and stress.</p>
+      <p class="ctas"><a class="btn" href="/active-meditation/">Read the summary</a><a class="btn ghost" href="{WHITEPAPER}">Download the PDF</a></p>
     </div>
   </div>
 </section>
@@ -289,17 +310,17 @@ def build_home(builds, community):
 <section class="wrap section two-col">
   <div>
     <h2>Reviews</h2>
-    <p>{n_reviews} candid reviews from the workbench, scored with Gary's eight-category rating system: Challenge, Enjoyment, Engineering and Fit, Materials and Finish, Instructions, Display Appeal, Value, and Overall.</p>
-    <p><a class="link" href="/reviews/">Read the reviews &rarr;</a></p>
+    <p>{n_reviews} candid reviews from my workbench, scored out of 5 in eight categories: Challenge, Enjoyment, Engineering and Fit, Materials and Finish, Instructions, Display Appeal, Value, and Overall.</p>
+    <p><a class="link" href="/reviews/">Read my reviews &rarr;</a></p>
   </div>
   <div>
     <h2>Community</h2>
-    <p>Moderator of r/ROKRPuzzles, r/ugears and r/DIYModelKits, and a board member of Florida Elks Children's Therapy Services. Speaker at Rolife's 9th anniversary celebration. Most recently: the {e(ev["title"])} at the {e(ev["where"])}.</p>
-    <p><a class="link" href="/community/">See the community work &rarr;</a></p>
+    <p>I help moderate three model-building communities on Reddit, and I host build events at the Port Orange Elks Lodge. I'm also on the board of Florida Elks Children's Therapy Services, and I spoke at Rolife's 9th anniversary celebration. Most recently: the {e(ev["title"])}.</p>
+    <p><a class="link" href="/community/">See what I'm up to &rarr;</a></p>
   </div>
 </section>
 """
-    page("/", None, "GWVan60: wooden 3D puzzles and miniature model builds, reviews, and the white paper on model building as active meditation, by Gary VanOpdorp.", body)
+    page("/", None, "Gary VanOpdorp (GWVan60) builds wooden 3D puzzles and miniature models, films them, and writes honest reviews of what worked and what broke.", body)
 
 
 def build_index(builds):
@@ -309,7 +330,14 @@ def build_index(builds):
     body = f"""
 <div class="wrap section">
   {title_block("The workbench", "Builds", f"{len(builds)} kits and counting")}
-  <div class="chips" role="group" aria-label="Filter by brand">{chips}</div>
+  <div class="finder">
+    <label class="search" for="build-search">
+      <span class="vh">Search builds by kit name or model number</span>
+      <input id="build-search" type="search" placeholder="Search by kit name or model number" autocomplete="off">
+    </label>
+    <div class="chips" role="group" aria-label="Filter by brand">{chips}</div>
+    <p class="no-hits" hidden>No builds match that. Try another name or model number.</p>
+  </div>
   <div class="grid" id="build-grid">{"".join(card(b) for b in builds)}</div>
 </div>"""
     page("/builds/", "Builds", "Every GWVan60 build: ROKR, Rolife and other wooden kits, with short videos, full builds and reviews.", body, active="Builds")
@@ -337,6 +365,7 @@ def build_kit(b, builds):
         main_player, layout = placeholder(b, cls="photo"), ""
     rv = b.get("_review")
     facts = [("Brand", b["brand"]), ("Model", b["model"]), ("Posted", fmt_date(b["date"]) if b["date"] else None),
+             ("Video", video_label(b)),
              ("Rating", f'{num(rv["overall"])}/5' if rv and rv["overall"] is not None else None), ("", builder_line(b))]
     facts_html = "".join(f"<div><dt>{k}</dt><dd>{e(v)}</dd></div>" if k else f'<div class="credit"><dd>{e(v)}</dd></div>'
                          for k, v in facts if v)
@@ -351,17 +380,26 @@ def build_kit(b, builds):
         links.append(("Instagram", f"https://www.instagram.com/reel/{b['instagram']}/"))
     links_html = "".join(f'<a class="pill" href="{u}" rel="noopener">{n}</a>' for n, u in links)
     watch = f'<h2 class="h3">Watch on</h2><p class="pills">{links_html}</p>' if links else ""
-    jump = f'<p class="ctas"><a class="btn" href="#review">Read Gary\'s review</a></p>' if rv else ""
+    # a plain link right under the player, for anyone whose browser blocks the embed
+    yt_url = (f"https://www.youtube.com/watch?v={b['full']}" if b["full"]
+              else f"https://www.youtube.com/shorts/{b['short']}" if b["short"] else None)
+    yt_line = (f'<p class="watch-yt"><a class="link" href="{yt_url}" rel="noopener">Watch on YouTube &rarr;</a></p>'
+               if yt_url else "")
+    jump = '<p class="ctas"><a class="btn" href="#review">Read my review</a></p>' if rv else ""
     if not rv and b["reddit"]:
         jump = f'<p class="ctas"><a class="btn" href="{e(b["reddit"])}" rel="noopener">Read the review on Reddit</a></p>'
     review_html = render_review(b, rv) if rv else ""
+    guides_html = "".join(
+        f'<aside class="guide-link"><p class="kicker">Troubleshooting</p><h2>{e(g["title"])}</h2>'
+        f'<p>{e(g["blurb"])}</p><p class="ctas"><a class="btn" href="/guides/{g["slug"]}/">Read the guide</a></p></aside>'
+        for g in b.get("_guides", []))
     more = [x for x in builds if x is not b and x["brand"] == b["brand"]][:3] or [x for x in builds if x is not b][:3]
     body = f"""
 <div class="wrap section">
   <p class="crumbs"><a href="/builds/">Builds</a> / {e(b["kit"])}</p>
   {title_block(b["brand"] or "Build", b["kit"], sub if b["model"] else None)}
   <div class="kit-row{layout}">
-    <div class="players">{main_player}</div>
+    <div class="players">{main_player}{yt_line}</div>
     <aside class="kit-info">
       <dl class="facts">{facts_html}</dl>
       {watch}
@@ -369,14 +407,15 @@ def build_kit(b, builds):
     </aside>
   </div>
   {review_html}
+  {guides_html}
   {full_section}
   <section class="section"><div class="section-head"><h2>More builds</h2><a href="/builds/">All builds &rarr;</a></div>
   <div class="grid">{"".join(card(x) for x in more)}</div></section>
 </div>"""
     if rv and rv["overall"] is not None:
-        desc = f"{name}: Gary's review, rated {num(rv['overall'])}/5, with notes on challenge, fit, materials, instructions and value. By GWVan60."
+        desc = f"{name}: my review, rated {num(rv['overall'])}/5, with notes on challenge, fit, materials, instructions and value. By GWVan60."
     elif rv:
-        desc = f"{name}: Gary's build story and review. By GWVan60."
+        desc = f"{name}: my build story and review. By GWVan60."
     else:
         desc = f"{name}: build video{' and review' if b['reddit'] else ''} by GWVan60."
     page(f"/builds/{b['slug']}/", name, desc, body, og_image=cover(b), active="Builds")
@@ -395,7 +434,9 @@ def rev_row(b):
              if rv["overall"] is not None else "")
     first = rv["intro"][0] if rv["intro"] else next((s["paras"][0] for s in rv["sections"] if s["paras"]), "")
     teaser = first if len(first) <= 150 else first[:first.rfind(" ", 0, 150)] + "..."
-    return (f'<li><a class="rev-row" href="/builds/{b["slug"]}/#review">{img}'
+    search = " ".join(x for x in (b["kit"], b["model"], b["brand"]) if x).lower()
+    return (f'<li data-brand="{e(b["brand"] or "Other")}" data-search="{e(search)}">'
+            f'<a class="rev-row" href="/builds/{b["slug"]}/#review">{img}'
             f'<span class="rev-text"><strong>{e(b["kit"])}</strong><span class="card-sub">{e(meta)}</span>'
             f'{score}<span class="rev-teaser">{e(teaser)}</span></span></a></li>')
 
@@ -406,25 +447,39 @@ def build_reviews(builds):
     story = [b for b in reviewed if b.get("review_type") == "full" and b["_review"]["overall"] is None]
     archive = [b for b in reviewed if b.get("review_type") == "archive"]
     cats = "".join(f"<li>{c}</li>" for c in CATEGORIES)
+    brands = sorted({b["brand"] or "Other" for b in reviewed})
+    chips = '<button class="chip" aria-pressed="true" data-filter="*">All</button>' + "".join(
+        f'<button class="chip" aria-pressed="false" data-filter="{e(x)}">{e(x)}</button>' for x in brands)
     body = f"""
 <div class="wrap section narrow">
   {title_block("Honest takes", "Reviews", f"{len(reviewed)} kits reviewed")}
-  <p class="lede">Candid, first-person reviews from the workbench: what worked, what broke, what needed wax, and whether the finished model earned its spot on the shelf.</p>
-  <div class="framed system">
-    <h2>The rating system</h2>
-    <p>Each kit is scored out of 5 in eight categories. Gary invented the system while building a KPOP Demon Hunters 4D kit. Now and then a kit earns a 6. His rating system, his rules.</p>
-    <ol class="cat-list">{cats}</ol>
+  <p class="lede">What worked, what broke, what needed wax, and whether the finished model earned its spot on the shelf.</p>
+
+  <div class="finder" id="rev-filter">
+    <label class="search" for="rev-search">
+      <span class="vh">Search reviews by kit name or model number</span>
+      <input id="rev-search" type="search" placeholder="Search by kit name or model number" autocomplete="off">
+    </label>
+    <div class="chips" role="group" aria-label="Filter by brand">{chips}</div>
+    <p class="no-hits" hidden>No reviews match that. Try another name or model number.</p>
   </div>
+
   <h2>Rated reviews</h2>
   <ul class="rev-list">{"".join(rev_row(b) for b in rated)}</ul>
   <h2>Before the rating system</h2>
   <p>Earlier reviews, written as build stories.</p>
   <ul class="rev-list">{"".join(rev_row(b) for b in story)}</ul>
   <h2>From the archive</h2>
-  <p>Summaries of Gary's earliest reviews. The full original wording was not recovered.</p>
+  <p>Summaries of my earliest reviews. The full original wording was not recovered.</p>
   <ul class="rev-list">{"".join(rev_row(b) for b in archive)}</ul>
+
+  <details class="framed system">
+    <summary><h2>How I rate kits</h2></summary>
+    <p>I score each kit out of 5 in eight categories. I came up with the system while building a KPOP Demon Hunters 4D kit. Now and then a kit earns a 6. My rating system, my rules.</p>
+    <ol class="cat-list">{cats}</ol>
+  </details>
 </div>"""
-    page("/reviews/", "Reviews", "Written reviews of wooden model kits from ROKR, Rolife and more, scored with GWVan60's eight-category rating system.", body, active="Reviews")
+    page("/reviews/", "Reviews", "My written reviews of wooden model kits from ROKR, Rolife and more, scored with my eight-category rating system.", body, active="Reviews")
 
 
 def build_meditation():
@@ -478,7 +533,7 @@ def talk_block(t):
     <p class="card-sub">{e(t["role"])} &middot; {e(t["where"])} &middot; {e(t["when"])}</p>
     <p>{e(t["blurb"])}</p>
     {player(t["youtube"], False, f'{t["title"]}: Gary VanOpdorp', t.get("start"), t.get("end"))}
-    <p class="credit-line">{e(t["credit"])} This player shows Gary's talk only ({mmss(t["start"])}&ndash;{mmss(t["end"])}).
+    <p class="credit-line">{e(t["credit"])} This player shows my talk only ({mmss(t["start"])}&ndash;{mmss(t["end"])}).
       <a class="link" href="https://www.youtube.com/watch?v={e(t["youtube"])}&amp;t={t["start"]}s" rel="noopener">Watch on YouTube</a></p>
   </article>"""
 
@@ -486,10 +541,13 @@ def talk_block(t):
 def build_community(community, talks):
     ev = community[0]
     talks_html = "".join(talk_block(t) for t in talks)
+    signup = (f'<p class="ctas"><a class="btn" href="{e(ev["signup"])}" rel="noopener">Sign up for the next build event</a></p>'
+              if ev.get("signup") else "")
+    contact = "".join(f'<a class="pill" href="{u}" rel="noopener">{n}: {h}</a>' for n, u, h in CONTACT)
     body = f"""
 <div class="wrap section narrow">
   {title_block("Around the workbench", "Community")}
-  <p class="lede">Model building is solitary at the bench and social around it. Gary helps moderate three of the hobby's online communities, speaks at hobby events, and brings building to his local lodge.</p>
+  <p class="lede">I help moderate three model-building communities on Reddit, and I host build events at the Port Orange Elks Lodge.</p>
   <h2>Speaking</h2>{talks_html}
   <h2>Moderator</h2>
   <ul class="pills-list">
@@ -498,11 +556,15 @@ def build_community(community, talks):
     <li><a class="pill" href="https://www.reddit.com/r/DIYModelKits/" rel="noopener">r/DIYModelKits</a></li>
   </ul>
   <h2>Florida Elks Children's Therapy Services</h2>
-  <p>Gary serves on the board of Florida Elks Children's Therapy Services.</p>
+  <p>I serve on the board of Florida Elks Children's Therapy Services.</p>
   <h2>{e(ev["title"])}</h2>
   <p class="card-sub">{e(ev["where"])} &middot; {fmt_date(ev["date"])}</p>
   <p>{e(ev["blurb"])}</p>
   {player(ev["youtube"], False, ev["title"])}
+  {signup}
+  <h2 id="contact">Contact me</h2>
+  <p>If you run a club or make kits and want to talk about an event, a build or a review, message me. I read both.</p>
+  <p class="pills">{contact}</p>
 </div>"""
     page("/community/", "Community", "GWVan60 in the community: speaking at Rolife's 9th anniversary, Reddit moderation, Florida Elks Children's Therapy Services, and lodge build events.", body, active="Community")
 
@@ -514,16 +576,37 @@ def build_about(builds):
   <div class="about-row">
     <img src="/img/logo-256.webp" alt="" width="200" height="200">
     <div>
-      <p class="lede">I'm Gary VanOpdorp, GWVan60 online. I've built more than 70 wooden and mechanical kits, and over the years the hobby has grown from assembly into sanding, edge coloring, painting, rigging, custom signs, electrical add-ons and repairs.</p>
-      <p>I film my builds at the bench and write detailed reviews so other builders know what they're getting into. The {len(builds)} builds on this site are the ones I've published so far.</p>
+      <p class="lede">I'm Gary VanOpdorp, GWVan60 online. My first kit was a Rolife carousel. These days I'll try just about any kit once, especially if I find it secondhand for next to nothing.</p>
+      <p>Once I get a kit on the bench, I start asking questions. Would those plywood edges look better in black? Why does Santa keep getting stuck in the cuckoo clock? And where am I going to put the dog? There's usually room for a dog.</p>
+      <p>I've built more than 70 wooden and mechanical kits, and over the years the hobby has grown from plain assembly into sanding, edge coloring, painting, rigging, custom signs, electrical add-ons and repairs. I film my builds at the bench and write up what I find, so other builders know what they're getting into. The {len(builds)} builds on this site are the ones I've published so far.</p>
       <p>In September 2026 I was one of the speakers at Rolife's 9th anniversary celebration at American Dream Mall in New Jersey. <a class="link" href="/community/">Watch my talk</a>.</p>
       <p>Away from the bench, I work as a fractional and full-time consultant in data and business analytics.</p>
     </div>
   </div>
   <h2>Find me</h2>
   <p class="pills">{"".join(f'<a class="pill" href="{u}" rel="me noopener">{n}: {h}</a>' for n, u, h in SOCIAL)}<span class="pill static">Craftime: GWVan60</span></p>
+  <p><a class="link" href="/community/#contact">Contact me &rarr;</a></p>
 </div>"""
     page("/about/", "About", "About Gary VanOpdorp (GWVan60): model builder, reviewer, Reddit moderator and data consultant.", body, active="About")
+
+
+def build_guide(g, builds):
+    """A short troubleshooting write-up, linked from the kit it belongs to."""
+    doc = parse_md(ROOT / "data" / "guides" / f"{g['slug']}.md")
+    kit = next((b for b in builds if b["slug"] == g.get("kit")), None)
+    parts = [f"<p>{md_inline(p)}</p>" for p in doc["intro"]]
+    for s in doc["sections"]:
+        parts.append(f'<h2>{e(s["name"])}</h2>' + "".join(f"<p>{md_inline(p)}</p>" for p in s["paras"]))
+    back = (f'<p class="ctas"><a class="btn ghost" href="/builds/{kit["slug"]}/">Read my {e(kit["kit"])} review</a></p>'
+            if kit else "")
+    body = f"""
+<div class="wrap section narrow">
+  <p class="crumbs"><a href="/builds/">Builds</a>{f' / <a href="/builds/{kit["slug"]}/">{e(kit["kit"])}</a>' if kit else ""} / Troubleshooting</p>
+  {title_block("Troubleshooting", g["title"], g.get("sub"))}
+  {"".join(parts)}
+  {back}
+</div>"""
+    page(f"/guides/{g['slug']}/", g["title"], g["blurb"], body, og_image=cover(kit) if kit else None, active="Builds")
 
 
 def build_redirect(old_path, new_path):
@@ -558,6 +641,9 @@ def main():
     builds = sorted(data["builds"], key=lambda b: b["date"] or "", reverse=True)
     for b in builds:
         b["_review"] = load_review(b["slug"])
+    guides = data.get("guides", [])
+    for b in builds:
+        b["_guides"] = [g for g in guides if g.get("kit") == b["slug"]]
     community = data["community"]
 
     THUMBS.mkdir(parents=True, exist_ok=True)
@@ -583,6 +669,8 @@ def main():
         build_kit(b, builds); paths.append(f"/builds/{b['slug']}/")
         for old in b.get("aliases", []):      # old addresses forward to the current page
             build_redirect(f"/builds/{old}/", f"/builds/{b['slug']}/")
+    for g in guides:
+        build_guide(g, builds); paths.append(f"/guides/{g['slug']}/")
     build_reviews(builds); paths.append("/reviews/")
     build_meditation(); paths.append("/active-meditation/")
     build_community(community, talks); paths.append("/community/")
