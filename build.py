@@ -34,6 +34,8 @@ WHITEPAPER = "/papers/active-meditation-through-model-building.pdf"
 # Where clubs and kit makers can reach me. No email address on the public site.
 CONTACT = [("YouTube", "https://www.youtube.com/@GWVan60", "@GWVan60"),
            ("Reddit", "https://www.reddit.com/user/GWVan60/", "u/GWVan60")]
+CRAFTIME = "https://www.craftime.com/users/3e3204c6-7330-43cf-806b-ffbe025a5443-@GWVan60"
+CRAFTIME_INVITE = "https://www.craftime.com/invite/v6ur3qeawjyotuxm"
 
 e = lambda s: html.escape(str(s), quote=True)
 
@@ -584,7 +586,8 @@ def build_about(builds):
     </div>
   </div>
   <h2>Find me</h2>
-  <p class="pills">{"".join(f'<a class="pill" href="{u}" rel="me noopener">{n}: {h}</a>' for n, u, h in SOCIAL)}<span class="pill static">Craftime: GWVan60</span></p>
+  <p class="pills">{"".join(f'<a class="pill" href="{u}" rel="me noopener">{n}: {h}</a>' for n, u, h in SOCIAL)}<a class="pill" href="{CRAFTIME}" rel="me noopener">Craftime: GWVan60</a></p>
+  <p>I post builds on Craftime too. If you're not on it yet, you can <a class="link" href="{CRAFTIME_INVITE}" rel="noopener">join Craftime with my invite</a>.</p>
   <p><a class="link" href="/community/#contact">Contact me &rarr;</a></p>
 </div>"""
     page("/about/", "About", "About Gary VanOpdorp (GWVan60): model builder, reviewer, Reddit moderator and data consultant.", body, active="About")
