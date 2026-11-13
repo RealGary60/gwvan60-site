@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "gwvan60-preview",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["build.py", "--serve"],
+      "port": 8060
+    }
+  ]
+}
