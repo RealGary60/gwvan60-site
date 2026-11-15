@@ -226,6 +226,9 @@ p { margin: 0 0 1em; }
   letter-spacing: .06em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; margin-bottom: 8px; }
 .event { margin-bottom: 36px; }
 .event h3 { margin: .2em 0 .2em; font-size: 1.5rem; }
+.event-row { display: grid; grid-template-columns: 140px 1fr; gap: 24px; align-items: start; }
+.event-row .event-img { border-radius: var(--radius); border: 1px solid var(--gold-soft); }
+@media (max-width: 640px) { .event-row { grid-template-columns: 1fr; } .event-row .event-img { max-width: 160px; margin: 0 auto; } }
 .event-teaser { background: var(--panel); border: 1px solid var(--gold-soft); border-radius: var(--radius); padding: 20px 22px; }
 .event-teaser h3 { margin: .2em 0 .2em; font-size: 1.25rem; }
 .event-teaser .ctas { margin: 0; }

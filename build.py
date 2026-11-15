@@ -553,14 +553,19 @@ def event_meta(u):
 
 def event_block(u):
     links_html = "".join(f'<a class="pill" href="{e(url)}" rel="noopener">{e(label)}</a>' for label, url in u.get("links", []))
-    return f"""
-  <article class="event">
-    <p class="tag-upcoming">Upcoming</p>
+    text = f"""<p class="tag-upcoming">Upcoming</p>
     <h3>{e(u["title"])}</h3>
     <p class="card-sub">{event_meta(u)}</p>
     <p>{e(u["blurb"])}</p>
-    {f'<p class="pills">{links_html}</p>' if links_html else ""}
+    {f'<p class="pills">{links_html}</p>' if links_html else ""}"""
+    if u.get("image"):
+        return f"""
+  <article class="event event-row">
+    <img class="event-img" src="{e(u['image'])}" alt="" width="320" height="400" loading="lazy">
+    <div>{text}</div>
   </article>"""
+    return f"""
+  <article class="event">{text}</article>"""
 
 
 def talk_block(t):

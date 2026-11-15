@@ -608,11 +608,13 @@
     },
     {
       "title": "A Gift to Build, a Story to Share",
-      "where": "r/ROKRPuzzles",
+      "where": "r/ROKRPuzzles & r/rolife",
       "date": null,
-      "blurb": "A community event on r/ROKRPuzzles, which I help moderate. Head over to Reddit for the full details.",
+      "image": "/img/builds/reddit-gift-event.webp",
+      "blurb": "A Rolife x ROKR gift-giving event across r/ROKRPuzzles (which I help moderate) and r/rolife. Phase 1, Nov 4-Dec 6: give someone their first kit, friend, family or a charity donation, using code FST20 for 20% off at Rolife, ROKR or Robotime, and register with the form below. Phase 2, Dec 6-Jan 6: if you registered in Phase 1, come back and share how the gift-giving went, posting your gift story with the FirstBuildGiftStory flair in r/rolife or r/rokrpuzzles. Every eligible story is an entry in a shared prize pool, with 2 Best Gift Story winners chosen from each community (nominations Jan 7-14, winners announced Jan 15).",
       "links": [
-        ["Read the post on Reddit", "https://www.reddit.com/r/rokrpuzzles/comments/1xnhmxk/a_gift_to_build_a_story_to_share/"]
+        ["Register for Phase 1 (code FST20)", "https://forms.gle/dzyt5ujMwKr5j52j9"],
+        ["Read the full post on Reddit", "https://www.reddit.com/r/rokrpuzzles/comments/1xnhmxk/a_gift_to_build_a_story_to_share/"]
       ]
     }
   ],
