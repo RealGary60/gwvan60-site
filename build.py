@@ -275,10 +275,23 @@ def title_block(kicker, title, sub=None):
 
 
 # ---------------------------------------------------------------- pages -----
-def build_home(builds, community):
+def build_home(builds, community, upcoming=None):
     latest = "".join(card(b) for b in [x for x in builds if x["short"] or x["full"]][:4])
     n_reviews = sum(1 for b in builds if b.get("_review"))
     ev = community[0]
+    upcoming = upcoming or []
+    teasers = "".join(f"""
+    <div class="event-teaser">
+      <p class="tag-upcoming">Upcoming</p>
+      <h3>{e(u["title"])}</h3>
+      <p class="card-sub">{event_meta(u)}</p>
+      <p class="ctas">{"".join(f'<a class="link" href="{e(url)}" rel="noopener">{e(label)} &rarr;</a>' for label, url in u.get("links", [])[:1])}</p>
+    </div>""" for u in upcoming)
+    upcoming_section = f"""
+<section class="wrap section">
+  <div class="section-head"><h2>Coming up</h2><a href="/community/">All community events &rarr;</a></div>
+  <div class="two-col">{teasers}</div>
+</section>""" if upcoming else ""
     body = f"""
 <section class="hero">
   <div class="wrap hero-row">
@@ -297,7 +310,7 @@ def build_home(builds, community):
   <div class="section-head"><h2>Latest builds</h2><a href="/builds/">All {len(builds)} builds &rarr;</a></div>
   <div class="grid">{latest}</div>
 </section>
-
+{upcoming_section}
 <section class="band wood">
   <div class="wrap band-row">
     <div class="framed">
@@ -528,6 +541,28 @@ def mmss(s):
     return f"{s // 60}:{s % 60:02d}"
 
 
+def event_meta(u):
+    parts = [e(u["where"])] if u.get("where") else []
+    if u.get("date"):
+        d = fmt_date(u["date"])
+        if u.get("time"):
+            d += f" &middot; {e(u['time'])}"
+        parts.append(d)
+    return " &middot; ".join(parts)
+
+
+def event_block(u):
+    links_html = "".join(f'<a class="pill" href="{e(url)}" rel="noopener">{e(label)}</a>' for label, url in u.get("links", []))
+    return f"""
+  <article class="event">
+    <p class="tag-upcoming">Upcoming</p>
+    <h3>{e(u["title"])}</h3>
+    <p class="card-sub">{event_meta(u)}</p>
+    <p>{e(u["blurb"])}</p>
+    {f'<p class="pills">{links_html}</p>' if links_html else ""}
+  </article>"""
+
+
 def talk_block(t):
     return f"""
   <article class="talk">
@@ -540,9 +575,11 @@ def talk_block(t):
   </article>"""
 
 
-def build_community(community, talks):
+def build_community(community, talks, upcoming=None):
     ev = community[0]
+    upcoming = upcoming or []
     talks_html = "".join(talk_block(t) for t in talks)
+    upcoming_html = "".join(event_block(u) for u in upcoming)
     signup = (f'<p class="ctas"><a class="btn" href="{e(ev["signup"])}" rel="noopener">Sign up for the next build event</a></p>'
               if ev.get("signup") else "")
     contact = "".join(f'<a class="pill" href="{u}" rel="noopener">{n}: {h}</a>' for n, u, h in CONTACT)
@@ -550,6 +587,7 @@ def build_community(community, talks):
 <div class="wrap section narrow">
   {title_block("Around the workbench", "Community")}
   <p class="lede">I help moderate three model-building communities on Reddit, and I host build events at the Port Orange Elks Lodge.</p>
+  {f'<h2>Upcoming</h2>{upcoming_html}' if upcoming_html else ""}
   <h2>Speaking</h2>{talks_html}
   <h2>Moderator</h2>
   <ul class="pills-list">
@@ -648,6 +686,7 @@ def main():
     for b in builds:
         b["_guides"] = [g for g in guides if g.get("kit") == b["slug"]]
     community = data["community"]
+    upcoming = data.get("upcoming", [])
 
     THUMBS.mkdir(parents=True, exist_ok=True)
     for b in builds:
@@ -666,7 +705,7 @@ def main():
     shutil.copytree(STATIC, DIST, dirs_exist_ok=True)
 
     paths = []
-    build_home(builds, community); paths.append("/")
+    build_home(builds, community, upcoming); paths.append("/")
     build_index(builds); paths.append("/builds/")
     for b in builds:
         build_kit(b, builds); paths.append(f"/builds/{b['slug']}/")
@@ -676,7 +715,7 @@ def main():
         build_guide(g, builds); paths.append(f"/guides/{g['slug']}/")
     build_reviews(builds); paths.append("/reviews/")
     build_meditation(); paths.append("/active-meditation/")
-    build_community(community, talks); paths.append("/community/")
+    build_community(community, talks, upcoming); paths.append("/community/")
     build_about(builds); paths.append("/about/")
     build_404()
 

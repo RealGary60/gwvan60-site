@@ -222,6 +222,13 @@ p { margin: 0 0 1em; }
 .rev-teaser { color: var(--muted); font-size: .92rem; }
 .talk { margin-bottom: 36px; }
 .talk h3 { margin: .2em 0 .2em; font-size: 1.6rem; }
+.tag-upcoming { display: inline-block; background: var(--gold); color: var(--ink); font-weight: 700; font-size: .72rem;
+  letter-spacing: .06em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; margin-bottom: 8px; }
+.event { margin-bottom: 36px; }
+.event h3 { margin: .2em 0 .2em; font-size: 1.5rem; }
+.event-teaser { background: var(--panel); border: 1px solid var(--gold-soft); border-radius: var(--radius); padding: 20px 22px; }
+.event-teaser h3 { margin: .2em 0 .2em; font-size: 1.25rem; }
+.event-teaser .ctas { margin: 0; }
 .credit-line { color: var(--muted); font-size: .9rem; margin-top: 10px; }
 .note { margin-top: 32px; padding: 16px 18px; border: 1px dashed var(--gold-deep); border-radius: var(--radius); color: var(--muted); font-size: .95rem; }
 .about-row { display: grid; grid-template-columns: 200px 1fr; gap: 32px; align-items: start; }

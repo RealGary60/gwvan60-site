@@ -575,7 +575,7 @@
       "role": "Speaker",
       "where": "American Dream Mall, New Jersey",
       "when": "September 2026",
-      "blurb": "Gary was one of four speakers at Rolife's ninth-anniversary celebration, sharing his story and his thoughts on creativity, making and community.",
+      "blurb": "I was one of four speakers at Rolife's ninth-anniversary celebration, sharing my story and my thoughts on creativity, making and community.",
       "youtube": "u_LXBZYEF-k",
       "start": 1818,
       "end": 2478,
@@ -591,6 +591,29 @@
       "youtube": "PoKJiAcKLsQ",
       "tiktok": "7706137816194960654",
       "instagram": "DfhRNQUgYoh"
+    }
+  ],
+  "upcoming": [
+    {
+      "title": "Christmas Music Box Build Event: Makeup Session",
+      "where": "Port Orange Elks Lodge",
+      "date": "2026-12-06",
+      "time": "2:00 PM",
+      "blurb": "A second session for anyone who couldn't make the November 8 build. Raffles again, with more kits to give away, and I'll have at least one finished kit to auction off, hopefully Christmas themed. MoyuStore donated two kits for the group to build and auction at a future event: a running horse and an airship. Come work on those, bring your own kit, or help others with their snow globes. There are also three music boxes left over from the first event if you know someone who missed it. Everyone's welcome, so invite anyone who might be interested. All proceeds go to Florida Elks Children's Therapy Services.",
+      "links": [
+        ["See the running horse", "https://www.facebook.com/reel/1006668012239962"],
+        ["See the airship", "https://www.youtube.com/shorts/xUotDrMAhcM"],
+        ["Join the Craftime community", "https://www.craftime.com/invite/v6ur3qeawjyotuxm"]
+      ]
+    },
+    {
+      "title": "A Gift to Build, a Story to Share",
+      "where": "r/ROKRPuzzles",
+      "date": null,
+      "blurb": "A community event on r/ROKRPuzzles, which I help moderate. Head over to Reddit for the full details.",
+      "links": [
+        ["Read the post on Reddit", "https://www.reddit.com/r/rokrpuzzles/comments/1xnhmxk/a_gift_to_build_a_story_to_share/"]
+      ]
     }
   ],
   "guides": [
