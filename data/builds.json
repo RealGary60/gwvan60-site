@@ -11,6 +11,27 @@
   ],
   "builds": [
     {
+      "slug": "rolife-polaris-post-dg187",
+      "brand": "Rolife",
+      "kit": "Polaris Post",
+      "model": "DG187",
+      "date": "2026-11-21",
+      "tags": [
+        "christmas",
+        "miniature house",
+        "lights"
+      ],
+      "short": "EYFj3Tyne84",
+      "full": null,
+      "tiktok": "7710788913132031246",
+      "instagram": "DgBckMBAAXF",
+      "reddit": null,
+      "builder": "gary",
+      "review_type": "full",
+      "image": "/img/builds/rolife-polaris-post-dg187.webp",
+      "verdict": "An approachable holiday build with excellent fit and a terrific foundation for customization. Mine grew into a whole post office scene."
+    },
+    {
       "slug": "robot-bunny-music-box-am481",
       "brand": "ROKR",
       "kit": "Robot Bunny Music Box",
