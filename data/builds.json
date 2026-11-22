@@ -246,21 +246,25 @@
       "brand": "ROKR",
       "kit": "Dream Gift Factory",
       "model": "EAB01",
-      "date": "2026-10-22",
+      "date": "2026-11-22",
       "tags": [
         "miniature house",
         "christmas",
-        "lights"
+        "lights",
+        "mechanical"
       ],
       "short": null,
-      "full": "jAOuISa2TTI",
-      "full_title": "Build video",
+      "full": "UasYHDN9Yho",
+      "full_vertical": true,
+      "full_title": "Full build",
+      "full_minutes": 6,
+      "verdict": "Gears, lights and a spinning tree, and a display that earned a 6/5. Thin boards and a few stubborn fits make you work for it.",
       "tiktok": null,
-      "instagram": null,
+      "instagram": "DgDQ5CvA8EF",
       "reddit": "https://www.reddit.com/r/rokrpuzzles/comments/1x1wssq/rokr_dream_gift_factory_eab01/",
       "builder": "gary",
       "review_type": "full",
-      "image": null
+      "image": "/img/builds/dream-gift-factory-eab01.webp"
     },
     {
       "slug": "deep-sea-animals-turtle",
