@@ -11,6 +11,27 @@
   ],
   "builds": [
     {
+      "slug": "arkitec-shrek-miniscape",
+      "brand": "Arkitec",
+      "kit": "Shrek Miniscape",
+      "model": null,
+      "date": "2026-11-25",
+      "tags": [
+        "miniature house",
+        "lights",
+        "mechanical"
+      ],
+      "short": null,
+      "full": null,
+      "tiktok": null,
+      "instagram": null,
+      "reddit": null,
+      "builder": "gary",
+      "review_type": "full",
+      "image": "/img/builds/arkitec-shrek-miniscape.webp",
+      "verdict": "My fifth Arkitec kit and the first I would warn people off. Poor fit, confusing instructions and a janky dragon, with the lighting the only feature that earns its keep."
+    },
+    {
       "slug": "rolife-polaris-post-dg187",
       "brand": "Rolife",
       "kit": "Polaris Post",
