@@ -11,6 +11,25 @@
   ],
   "builds": [
     {
+      "slug": "arkitec-tokyo-ak8005",
+      "brand": "Arkitec",
+      "kit": "Tokyo",
+      "model": "AK8005",
+      "date": null,
+      "tags": [
+        "lights",
+        "miniature"
+      ],
+      "short": null,
+      "full": null,
+      "tiktok": null,
+      "instagram": null,
+      "reddit": null,
+      "builder": "gary",
+      "review_type": "full",
+      "image": "/img/builds/arkitec-tokyo-ak8005.webp"
+    },
+    {
       "slug": "arkitec-shrek-miniscape",
       "brand": "Arkitec",
       "kit": "Shrek Miniscape",
