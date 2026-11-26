@@ -75,6 +75,10 @@ def thumb(vid):
 
 def video_label(b):
     """What kind of video a kit has, with its runtime: 'Full build · 34 min' or 'Short'."""
+    if b.get("video_label"):
+        return b["video_label"]
+    if b.get("local_video"):
+        return b.get("full_title") or "Video"
     if b.get("full"):
         mins = b.get("full_minutes")
         return f"Full build · {mins} min" if mins else "Full build"
@@ -172,6 +176,15 @@ def player(vid, vertical, label, start=None, end=None, poster=None):
             f'<img src="{poster or thumb(vid)}" alt="" loading="lazy">'
             f'<span class="play" aria-hidden="true"><svg viewBox="0 0 68 48"><path d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.2.3 34 .3 34 .3S12.8.3 7.5 1.7a8.5 8.5 0 0 0-6 6C.2 13 .2 24 .2 24s0 11 1.3 16.3a8.5 8.5 0 0 0 6 6C12.8 47.7 34 47.7 34 47.7s21.2 0 26.5-1.4a8.5 8.5 0 0 0 6-6C67.8 35 67.8 24 67.8 24s0-11-1.3-16.3z" fill="#e8c766"/><path d="M27 34V14l18 10z" fill="#0d1626"/></svg></span>'
             f'</button></div>')
+
+
+def local_player(src, vertical, label, poster=None):
+    """Self-hosted video, for builds that are not on YouTube. Served from static/video/."""
+    cls = "player vertical" if vertical else "player wide"
+    pos = f' poster="{e(poster)}"' if poster else ""
+    return (f'<div class="{cls}"><video controls playsinline preload="none"{pos} '
+            f'aria-label="{e(label)}"><source src="{e(src)}" type="video/mp4">'
+            f'<a href="{e(src)}">Download the video</a></video></div>')
 
 
 def builder_line(b):
@@ -366,8 +379,15 @@ def build_kit(b, builds):
     full_fig = (f'<figure{"" if full_vert else " class=\"wide-fig\""}>'
                 f'{player(b["full"], full_vert, f"{name}: {full_label}", poster=b.get("image") if full_vert else None)}'
                 f'<figcaption>{e(full_label)}</figcaption></figure>') if b["full"] else ""
+    local = b.get("local_video")
+    local_vert = bool(b.get("local_vertical", True))
     full_section = ""
-    if b["short"]:
+    if local:
+        main_player = (f'<figure{"" if local_vert else " class=\"wide-fig\""}>'
+                       f'{local_player(local, local_vert, f"{name}: {full_label}", poster=b.get("image"))}'
+                       f'<figcaption>{e(full_label)}</figcaption></figure>')
+        layout = "" if local_vert else " wide-main"
+    elif b["short"]:
         main_player = f'<figure>{player(b["short"], True, name)}<figcaption>The short</figcaption></figure>'
         full_section = (f'<section class="full-build"><h2>{e(full_label)}</h2>{full_fig}</section>' if full_fig else "")
         layout = ""
